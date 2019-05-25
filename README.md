@@ -2,6 +2,11 @@
 
 > this program can download the image in the website with img tag.
 ## Usage
+
+```
+node main.js
+```
+## API
 ### Just enter your requirement in info!
 * enter the require URL
 ``` 
