@@ -1,0 +1,59 @@
+var request = require('request');
+var cheerio = require('cheerio');
+
+//function for get Image URL 
+const fetchImageURL = (info) => new Promise((resolve, reject) => {
+    request(info.mainUrl, function (error, response, html) {
+        if (error) reject(error);
+        var $ = cheerio.load(html);
+        let returnData = [];
+        const is_local = / ^(\/)/
+        //get the image url by src attr in img tag
+        $("img").each(function (i, element) {
+            if (info.re_macro.every((item) => {
+                return item[0].test(element.attribs.src) === item[1];
+            }))//check whether the img src match your requirement in re_macro
+                returnData.push({
+                    //define your file name.Using alt first ,class second ,or calling it as img directly.
+                    name: ($(this).attr("alt") || $(this).attr("class") || "img") + "_" + i,
+                    //get the url in src.If the url is localside,add its own mainurl before it.
+                    link: $(this).attr('src').match(is_local) ? info.mainUrl + $(this).attr('src') : $(this).attr('src'),
+                })
+        });
+        resolve(returnData);
+    })
+})
+
+
+//function for download image
+var fs = require('fs');
+var download = function (uri, filename, callback) {
+    request.head(uri, function (err, res, body) {
+        console.log('content-type:', res.headers['content-type']);
+        console.log('content-length:', res.headers['content-length']);
+        request(uri)
+            .pipe(fs.createWriteStream(filename + "." + res.headers['content-type'].split("image/")[1]))
+            .on('close', callback);
+    });
+};
+
+
+/* execute it */
+
+//if the require path is not exist ,create it
+module.exports = function (info) {
+    if (!fs.existsSync(info.path)) {
+        fs.mkdirSync(info.path, () => {
+            console.log("created path:", info.path)
+        });
+
+    }
+    fetchImageURL(info).then(data => {
+        data.forEach((elem, index) => {
+            download(elem.link, "./" + info.path + "/" + elem.name, function () {
+                console.log('done', elem);
+            });
+        })
+    }).catch((error) => { console.log(error) })
+}
+
