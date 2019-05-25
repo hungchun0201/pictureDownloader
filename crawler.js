@@ -22,7 +22,7 @@ const fetchImageURL = (info) => new Promise((resolve, reject) => {
                         name: ($(this).attr("alt") || $(this).attr("class") || "img") + "_" + i,
                         //get the url in src.If the url is localside,add its own mainurl before it.
                         link: $(this).attr('data-src').match(is_local) ? $(this).attr('data-src') :
-                            info.mainUrl + $(this).attr('data-src'),
+                            info.mainUrl + '/' + $(this).attr('data-src'),
                     })
                 }
                 else {
@@ -31,7 +31,7 @@ const fetchImageURL = (info) => new Promise((resolve, reject) => {
                         name: ($(this).attr("alt") || $(this).attr("class") || "img") + "_" + i,
                         //get the url in src.If the url is localside,add its own mainurl before it.
                         link: $(this).attr('src').match(is_local) ? $(this).attr('src') :
-                            info.mainUrl + $(this).attr('src'),
+                            info.mainUrl + '/' + $(this).attr('src'),
                     })
                 }
 
