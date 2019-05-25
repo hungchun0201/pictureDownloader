@@ -1,6 +1,6 @@
 # A simple picture downloader using Node.js
 
-> this program can download the image in the website with img tag.
+> this program can download the image with img tag in the website.
 ## Usage
 
 ```
