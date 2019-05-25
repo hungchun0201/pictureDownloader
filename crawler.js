@@ -15,16 +15,15 @@ const fetchImageURL = (info) => new Promise((resolve, reject) => {
             }))//check whether the img src match your requirement in re_macro
             {
                 console.log(element.attribs);
-                if ($(this).attr('src') === undefined) {
-                    if (element.attribs["data-src"]) {
-                        returnData.push({
-                            //define your file name.Using alt first ,class second ,or calling it as img directly.
-                            name: ($(this).attr("alt") || $(this).attr("class") || "img") + "_" + i,
-                            //get the url in src.If the url is localside,add its own mainurl before it.
-                            link: $(this).attr('data-src').match(is_local) ? $(this).attr('data-src') :
-                                info.mainUrl + $(this).attr('data-src'),
-                        })
-                    }
+
+                if (element.attribs["data-src"]) {
+                    returnData.push({
+                        //define your file name.Using alt first ,class second ,or calling it as img directly.
+                        name: ($(this).attr("alt") || $(this).attr("class") || "img") + "_" + i,
+                        //get the url in src.If the url is localside,add its own mainurl before it.
+                        link: $(this).attr('data-src').match(is_local) ? $(this).attr('data-src') :
+                            info.mainUrl + $(this).attr('data-src'),
+                    })
                 }
                 else {
                     returnData.push({
@@ -47,6 +46,10 @@ const fetchImageURL = (info) => new Promise((resolve, reject) => {
 var fs = require('fs');
 var download = function (uri, filename, callback) {
     request.head(uri, function (err, res, body) {
+        if (err) {
+            console.error(err, "in link " + uri);
+            return;
+        }
         console.log('content-type:', res.headers['content-type']);
         console.log('content-length:', res.headers['content-length']);
         let file_type = res.headers["content-type"].split("image/")[1];
@@ -75,7 +78,7 @@ module.exports = function (info) {
         console.log(data);
         data.forEach((elem, index) => {
             download(elem.link, "./" + info.path + "/" + elem.name, function () {
-                console.log('done', elem);
+                console.log('done for : ', elem.link);
             });
         })
     }).catch((error) => { console.log(error) })
